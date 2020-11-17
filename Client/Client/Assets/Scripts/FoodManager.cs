@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class FoodManager : MonoBehaviour
 {
-    public GameObject food;
+    public Food foodPrefab;
 
     public static FoodManager instance;
+
+    public List<Food> spawnedFood;
     private void Awake()
     {
         if (instance == null)
@@ -24,13 +26,15 @@ public class FoodManager : MonoBehaviour
         //StartCoroutine(InstantiateFood());
     }
 
-    public void InstantiateFood(Vector2 position)
+    public void InstantiateFood(Vector2 position, int id)
     {
         //while (true)
         //{
-            //float x = Random.Range(-50, 50);
-            //float y = Random.Range(-50, 50);
-            Instantiate(food, new Vector3(position.x, position.y, 0), Quaternion.identity, gameObject.transform);
+        //float x = Random.Range(-50, 50);
+        //float y = Random.Range(-50, 50);
+        Food newFood = Instantiate(foodPrefab, new Vector3(position.x, position.y, 0), Quaternion.identity, gameObject.transform);
+        newFood.id = id;
+        spawnedFood.Add(newFood);
           //  yield return new WaitForSeconds(0.1f);
         //}
     }

@@ -76,17 +76,29 @@ public class ConnectionManager : MonoBehaviour
         { 
             if (packetNumber == 1) 
             {
-                Vector2 foodPosition = ParsePosition(receivedData);
-                FoodManager.instance.InstantiateFood(foodPosition);
+                int id;
+                Vector2 foodPosition = ParseFoodPosition(receivedData, out id);
+                FoodManager.instance.InstantiateFood(foodPosition, id);
             }
-            else
+            else if(packetNumber == 2)
             {
-                Debug.Log("Om-nom-nom");
+                CollisionInfo collisionInfo = ParseCollision(receivedData);
+                Debug.LogWarning(collisionInfo.playerId + "   " + collisionInfo.foodId);
+                var spawnedFood = FoodManager.instance.spawnedFood.Find(x => x.id == collisionInfo.foodId);
+                Destroy(spawnedFood.gameObject);
+                FoodManager.instance.spawnedFood.Remove(spawnedFood);
             }
             receivedData = ReceivePacket(out packetNumber);
         }
         var position = ParsePosition(receivedData);
         UpdatePlayerPosition(position);
+    }
+
+    private CollisionInfo ParseCollision(byte[] receivedData)
+    {
+        int playerId = BitConverter.ToInt32(receivedData, 4);
+        int foodId = BitConverter.ToInt32(receivedData, 8);
+        return new CollisionInfo() { playerId = playerId, foodId = foodId };
     }
 
     private byte[] ReceivePacket(out int packetNumber)
@@ -95,6 +107,15 @@ public class ConnectionManager : MonoBehaviour
         Debug.Log("receive data from " + serverEndPoint.ToString());
         packetNumber = BitConverter.ToInt32(receivedData, 0);
         return receivedData;
+    }
+
+    private Vector2 ParseFoodPosition(byte[] receivedData, out int id)
+    {
+        Vector2 position;
+        id = BitConverter.ToInt32(receivedData, 4);
+        position.x = BitConverter.ToSingle(receivedData, 8);
+        position.y = BitConverter.ToSingle(receivedData, 12);
+        return position;
     }
 
     private Vector2 ParsePosition(byte[] receivedData)

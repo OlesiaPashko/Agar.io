@@ -224,6 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dba1de731c31da240b29137fe816c349, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isGameStarted: 0
 --- !u!4 &380394028
 Transform:
   m_ObjectHideFlags: 0
@@ -508,7 +509,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 912657e01fc55b44bb5ba25d396fb063, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  food: {fileID: 3232848480228824790, guid: 612a774c4182d634c9b91dc0b20be8d3, type: 3}
+  foodPrefab: {fileID: 3232848480228824794, guid: 612a774c4182d634c9b91dc0b20be8d3,
+    type: 3}
+  spawnedFood: []
 --- !u!4 &532094036
 Transform:
   m_ObjectHideFlags: 0
@@ -1372,7 +1375,6 @@ MonoBehaviour:
   rb: {fileID: 2067168474}
   mass: 10
   id: 0
-  isMoving: 0
 --- !u!58 &2067168476
 CircleCollider2D:
   m_ObjectHideFlags: 0

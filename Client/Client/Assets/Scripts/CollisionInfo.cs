@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Food : MonoBehaviour
+public class CollisionInfo
 {
-    public int id;
+    public int playerId;
+    public int foodId;
 }
