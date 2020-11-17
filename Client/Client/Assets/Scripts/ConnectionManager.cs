@@ -11,6 +11,7 @@ public class ConnectionManager : MonoBehaviour
     public UdpClient udpClient = new UdpClient();
     public IPEndPoint serverEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 11000);//server endpoint
 
+    public bool isGameStarted = false;
     public static ConnectionManager instance;
     private void Awake()
     {
@@ -67,27 +68,38 @@ public class ConnectionManager : MonoBehaviour
         return id;
     }
 
-    public Vector2 ReceivePosition()
+    public void ReceiveAndManagePacket()
     {
-        // then receive data
         int packetNumber;
-        Vector2 position = ReceivePacket(out packetNumber);
-        while (packetNumber != 0)
-        {
-            FoodManager.instance.InstantiateFood(position);
-            position = ReceivePacket(out packetNumber);
+        byte[] receivedData = ReceivePacket(out packetNumber);
+        while (packetNumber != 0) 
+        { 
+            if (packetNumber == 1) 
+            {
+                Vector2 foodPosition = ParsePosition(receivedData);
+                FoodManager.instance.InstantiateFood(foodPosition);
+            }
+            else
+            {
+                Debug.Log("Om-nom-nom");
+            }
+            receivedData = ReceivePacket(out packetNumber);
         }
-        Debug.Log(position);
-        return position;
+        var position = ParsePosition(receivedData);
+        UpdatePlayerPosition(position);
     }
 
-    private Vector2 ReceivePacket(out int packetNumber)
+    private byte[] ReceivePacket(out int packetNumber)
     {
         var receivedData = udpClient.Receive(ref serverEndPoint);
-
         Debug.Log("receive data from " + serverEndPoint.ToString());
-        Vector2 position;
         packetNumber = BitConverter.ToInt32(receivedData, 0);
+        return receivedData;
+    }
+
+    private Vector2 ParsePosition(byte[] receivedData)
+    {
+        Vector2 position;
         position.x = BitConverter.ToSingle(receivedData, 4);
         position.y = BitConverter.ToSingle(receivedData, 8);
         return position;
@@ -102,6 +114,24 @@ public class ConnectionManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (isGameStarted)
+        {
+            SendCameraDirection();
+            ReceiveAndManagePacket();
+        }
+    }
+
+    private void UpdatePlayerPosition(Vector2 newPosition)
+    {
+        PlayerManager.instance.transform.position = new Vector3(newPosition.x, newPosition.y, 0);
+    }
+
+    private void SendCameraDirection()
+    {
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 direction = (mousePosition - PlayerManager.instance.transform.position).normalized;
+        //var velocity = new Vector2(direction.x * speed, direction.y * speed);
+        //transform.position += new Vector3(0.1f * velocity.x, 0.1f * velocity.y, 0);
+        SendDirection(direction);
     }
 }

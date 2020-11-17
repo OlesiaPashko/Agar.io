@@ -14,9 +14,15 @@ namespace Server
         public Vector2 ReceiveDirection(UdpClient udpServer, IPEndPoint remoteEP);
         public void SendPosition(UdpClient udpServer, Vector2 direction, Player player, IPEndPoint remoteEP);
         public void SendFoodPosition(UdpClient udpServer, IPEndPoint remoteEP);
+        public void SendCollision(UdpClient udpServer, IPEndPoint remoteEP, Player player, Circle circle);
     }
     public class ConnectionManager : IConnectionManager
     {
+        private readonly IFoodManager foodManager;
+        public ConnectionManager(IFoodManager foodManager)
+        {
+            this.foodManager = foodManager;
+        }
         public IPEndPoint ReceiveUsername(UdpClient udpServer, IPEndPoint remoteEP)
         {
             var data = udpServer.Receive(ref remoteEP); // listen on port 11000
@@ -54,7 +60,7 @@ namespace Server
 
         public void SendPosition(UdpClient udpServer, Vector2 direction, Player player, IPEndPoint remoteEP)
         {
-            Vector2 position = player.GetPosition(direction);
+            Vector2 position = player.UpdatePosition(direction);
             Console.WriteLine(position);
             List<byte> message = new List<byte>();
             message.AddRange(BitConverter.GetBytes(0));
@@ -67,7 +73,7 @@ namespace Server
         {
             while (true)
             {
-                Vector2 position = FoodCreator.CreateFood();
+                Vector2 position = foodManager.CreateFood();
                 Console.WriteLine("Food spawned = " + position);
                 List<byte> message = new List<byte>();
                 message.AddRange(BitConverter.GetBytes(1));
@@ -76,6 +82,17 @@ namespace Server
                 udpServer.Send(message.ToArray(), message.Count, remoteEP);
                 Thread.Sleep(100);
             }
+        }
+
+        public void SendCollision(UdpClient udpServer, IPEndPoint remoteEP, Player player, Circle circle)
+        {
+            Console.WriteLine("Collisiont = " + player.position + "  " + circle.position);
+            List<byte> message = new List<byte>();
+            message.AddRange(BitConverter.GetBytes(2));
+            message.AddRange(BitConverter.GetBytes(player.Id));
+            message.AddRange(BitConverter.GetBytes(circle.position.X));
+            message.AddRange(BitConverter.GetBytes(circle.position.Y));
+            udpServer.Send(message.ToArray(), message.Count, remoteEP);            
         }
     }
 }

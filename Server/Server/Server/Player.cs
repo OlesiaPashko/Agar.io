@@ -11,24 +11,11 @@ namespace Server
         public float speed = 10f;
         public float calcTime = 0.1f;//we calculate time 100 times per second
         public int Id { get; set; }
-        public Vector2 GetPosition(Vector2 direction)
+        public Vector2 UpdatePosition(Vector2 direction)
         {
             velocity = new Vector2(direction.X , direction.Y);
             position += calcTime * velocity;
             return position;
-        }
-
-        public bool isCollision(Circle circle)
-        {
-            var dx = position.X - circle.position.X;
-            var dy = position.Y - circle.position.Y;
-            var distance = Math.Pow(dx * dx + dy * dy, 2);
-
-            if (distance < radius + circle.radius)
-            {
-                return true;
-            }
-            return false;
         }
     }
 }

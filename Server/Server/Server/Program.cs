@@ -27,6 +27,7 @@ namespace Server
            .AddSingleton<IIdGenerator, IdGenerator>()
            .AddSingleton<IConnectionManager, ConnectionManager>()
            .AddSingleton<IGameManager, GameManager>()
+           .AddSingleton<IFoodManager, FoodManager>()
            .BuildServiceProvider();
 
             return serviceProvider;

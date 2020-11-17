@@ -18,10 +18,22 @@ namespace Server
         public static ConcurrentBag<Player> players = new ConcurrentBag<Player>();
         private readonly IIdGenerator idGenerator;
         private readonly IConnectionManager connectionManager;
-        public GameManager(IIdGenerator idGenerator, IConnectionManager connectionManager)
+        private readonly IFoodManager foodManager;
+        public List<Circle> SpawnedFood => new List<Circle>();
+        public Vector2 CreateFood()
+        {
+            Random r = new Random();
+            float x = r.Next(-50, 50);
+            float y = r.Next(-50, 50);
+            Vector2 foodPosition = new Vector2(x, y);
+            SpawnedFood.Add(new Circle { position = foodPosition, radius = 50f });
+            return foodPosition;
+        }
+        public GameManager(IIdGenerator idGenerator, IConnectionManager connectionManager, IFoodManager foodManager)
         {
             this.idGenerator = idGenerator;
             this.connectionManager = connectionManager;
+            this.foodManager = foodManager;
         }
         public void StartGame()
         {
@@ -34,7 +46,7 @@ namespace Server
             Console.Write("receive data from " + remoteEP.ToString());
             int id = idGenerator.GetId();
             udpServer.Send(BitConverter.GetBytes(id), 4, remoteEP); // reply back
-            players.Add(new Player { Id = id, radius = 1 });
+            players.Add(new Player { Id = id, radius = 50 });
             UpdateField(udpServer, remoteEP);
         }
         public void UpdateField(UdpClient udpServer, IPEndPoint remoteEP)
@@ -51,6 +63,7 @@ namespace Server
                     {
                         UpdatePlayerPosition(udpServer, remoteEP, player);
                     }
+                    CheckCollisions(udpServer, remoteEP);
                     _nextLoop = _nextLoop.AddMilliseconds(20);
                     if (_nextLoop > DateTime.Now)
                     {
@@ -65,6 +78,27 @@ namespace Server
         {
             Vector2 direction = connectionManager.ReceiveDirection(udpServer, remoteEP);
             connectionManager.SendPosition(udpServer, direction, player, remoteEP);
+        }
+
+        private void CheckCollisions(UdpClient udpServer, IPEndPoint remoteEP)
+        {
+            Console.WriteLine("-----------------------------------------------------------------------");
+            var food = SpawnedFood;
+            Console.WriteLine("food.Count " + food.Count);
+            foreach(var player in players)
+            {
+
+                Console.WriteLine("Player");
+                foreach (var foodItem in food)
+                {
+
+                    Console.WriteLine("Food");
+                    if (player.IsCollision(foodItem))
+                    {
+                        connectionManager.SendCollision(udpServer, remoteEP, player, foodItem);
+                    }
+                }
+            }
         }
     }
 }

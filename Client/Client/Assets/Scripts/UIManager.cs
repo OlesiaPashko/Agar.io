@@ -22,7 +22,7 @@ public class UIManager : MonoBehaviour
 
         DisableMenuUI();
 
-        PlayerManager.instance.isMoving = true;
+        ConnectionManager.instance.isGameStarted = true;
     }
 
 

@@ -12,7 +12,6 @@ public class PlayerManager : MonoBehaviour
     public float mass = 100;
     public int id = 0;
     public static PlayerManager instance;
-    public bool isMoving = false;
     private void Awake()
     {
         if (instance == null)
@@ -25,7 +24,7 @@ public class PlayerManager : MonoBehaviour
             Destroy(this);
         }
     }
-    void FixedUpdate()
+    /*void FixedUpdate()
     {
         if (isMoving)
         {
@@ -38,7 +37,7 @@ public class PlayerManager : MonoBehaviour
             transform.position = new Vector3(newPosition.x, newPosition.y, 0);
         }
     }
-
+    */
 
     public void Grow(int mass)
     {
