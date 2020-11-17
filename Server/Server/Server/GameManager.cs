@@ -67,7 +67,7 @@ namespace Server
                         UpdatePlayerPosition(udpServer, remoteEP, player);
                     }
                     CheckCollisions(udpServer, remoteEP);
-                    if (counter >= 4)
+                    if (counter >= 10)
                     {
                         connectionManager.SendFoodPosition(udpServer, remoteEP);
                         counter = 0;

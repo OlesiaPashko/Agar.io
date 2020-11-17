@@ -82,16 +82,22 @@ public class ConnectionManager : MonoBehaviour
             }
             else if(packetNumber == 2)
             {
-                CollisionInfo collisionInfo = ParseCollision(receivedData);
-                Debug.LogWarning(collisionInfo.playerId + "   " + collisionInfo.foodId);
-                var spawnedFood = FoodManager.instance.spawnedFood.Find(x => x.id == collisionInfo.foodId);
-                Destroy(spawnedFood.gameObject);
-                FoodManager.instance.spawnedFood.Remove(spawnedFood);
+                Eat(receivedData);
             }
             receivedData = ReceivePacket(out packetNumber);
         }
         var position = ParsePosition(receivedData);
         UpdatePlayerPosition(position);
+    }
+
+    private void Eat(byte[] receivedData)
+    {
+        CollisionInfo collisionInfo = ParseCollision(receivedData);
+        Debug.LogWarning(collisionInfo.playerId + "   " + collisionInfo.foodId);
+        var spawnedFood = FoodManager.instance.spawnedFood.Find(x => x.id == collisionInfo.foodId);
+        Destroy(spawnedFood.gameObject);
+        FoodManager.instance.spawnedFood.Remove(spawnedFood);
+        PlayerManager.instance.Grow(1);
     }
 
     private CollisionInfo ParseCollision(byte[] receivedData)
