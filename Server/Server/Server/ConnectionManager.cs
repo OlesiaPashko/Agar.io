@@ -71,9 +71,9 @@ namespace Server
 
         public void SendFoodPosition(UdpClient udpServer, IPEndPoint remoteEP)
         {
-            //while (true)
-            //{
-            int id;
+            while (true)
+            {
+                int id;
                 Vector2 position = foodManager.CreateFood(out id);
                 Console.WriteLine("Food spawned = " + position);
                 List<byte> message = new List<byte>();
@@ -82,8 +82,8 @@ namespace Server
                 message.AddRange(BitConverter.GetBytes(position.X));
                 message.AddRange(BitConverter.GetBytes(position.Y));
                 udpServer.Send(message.ToArray(), message.Count, remoteEP);
-               // Thread.Sleep(100);
-            //}
+                Thread.Sleep(200);
+            }
         }
 
         public void SendCollision(UdpClient udpServer, IPEndPoint remoteEP, Player player, Circle circle)
@@ -93,6 +93,7 @@ namespace Server
             message.AddRange(BitConverter.GetBytes(2));
             message.AddRange(BitConverter.GetBytes(player.id));
             message.AddRange(BitConverter.GetBytes(circle.id));
+            message.AddRange(BitConverter.GetBytes(player.radius));
             udpServer.Send(message.ToArray(), message.Count, remoteEP);            
         }
     }

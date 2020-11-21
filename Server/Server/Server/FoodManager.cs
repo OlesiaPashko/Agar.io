@@ -29,7 +29,7 @@ namespace Server
             float y = r.Next(-50, 50);
             Vector2 foodPosition = new Vector2(x, y);
             id = idGenerator.GetId();
-            SpawnedFood.Add(new Circle { position = foodPosition, radius = 0.2f, id = id });
+            SpawnedFood.Add(new Circle { position = foodPosition, radius = 0.2f, id = id, mass = 1 });
             Console.Write("+++++++++++++++++++++++++");
             Console.WriteLine("SpawnedFood.Count " + SpawnedFood.Count);
             return foodPosition;

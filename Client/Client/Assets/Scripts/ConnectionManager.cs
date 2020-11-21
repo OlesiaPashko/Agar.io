@@ -34,7 +34,7 @@ public class ConnectionManager : MonoBehaviour
 
     public void SendDirection(Vector2 direction)
     {
-        Debug.Log(direction);
+        //Debug.Log(direction);
         List<byte> message = new List<byte>();
         message.AddRange(BitConverter.GetBytes(direction.x));
         message.AddRange(BitConverter.GetBytes(direction.y));
@@ -52,7 +52,7 @@ public class ConnectionManager : MonoBehaviour
         // then receive data
         var receivedData = udpClient.Receive(ref serverEndPoint);
 
-        Debug.Log("receive data from " + serverEndPoint.ToString());
+        //Debug.Log("receive data from " + serverEndPoint.ToString());
         int id = 0;
         if (receivedData.Length > 3)
         {
@@ -64,7 +64,7 @@ public class ConnectionManager : MonoBehaviour
             throw new Exception("Could not read value of type 'int'!");
         }
 
-        Debug.Log(id);
+        //Debug.Log(id);
         return id;
     }
 
@@ -93,24 +93,25 @@ public class ConnectionManager : MonoBehaviour
     private void Eat(byte[] receivedData)
     {
         CollisionInfo collisionInfo = ParseCollision(receivedData);
-        Debug.LogWarning(collisionInfo.playerId + "   " + collisionInfo.foodId);
+       // Debug.LogWarning(collisionInfo.playerId + "   " + collisionInfo.foodId);
         var spawnedFood = FoodManager.instance.spawnedFood.Find(x => x.id == collisionInfo.foodId);
         Destroy(spawnedFood.gameObject);
         FoodManager.instance.spawnedFood.Remove(spawnedFood);
-        PlayerManager.instance.Grow(1);
+        PlayerManager.instance.Grow(collisionInfo.radius);
     }
 
     private CollisionInfo ParseCollision(byte[] receivedData)
     {
         int playerId = BitConverter.ToInt32(receivedData, 4);
         int foodId = BitConverter.ToInt32(receivedData, 8);
-        return new CollisionInfo() { playerId = playerId, foodId = foodId };
+        float radius = BitConverter.ToSingle(receivedData, 12);
+        return new CollisionInfo() { playerId = playerId, foodId = foodId, radius = radius };
     }
 
     private byte[] ReceivePacket(out int packetNumber)
     {
         var receivedData = udpClient.Receive(ref serverEndPoint);
-        Debug.Log("receive data from " + serverEndPoint.ToString());
+        //Debug.Log("receive data from " + serverEndPoint.ToString());
         packetNumber = BitConverter.ToInt32(receivedData, 0);
         return receivedData;
     }
@@ -129,6 +130,7 @@ public class ConnectionManager : MonoBehaviour
         Vector2 position;
         position.x = BitConverter.ToSingle(receivedData, 4);
         position.y = BitConverter.ToSingle(receivedData, 8);
+        //Debug.Log("position" + position);
         return position;
     }
 

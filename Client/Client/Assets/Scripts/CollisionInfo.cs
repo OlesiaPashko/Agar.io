@@ -6,4 +6,5 @@ public class CollisionInfo
 {
     public int playerId;
     public int foodId;
+    public float radius;
 }

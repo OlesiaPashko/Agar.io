@@ -10,6 +10,7 @@ namespace Server
         public Vector2 position;
         public float radius;
         public int id;
+        public float mass;
         public bool IsCollision(Circle circle)
         {
             var dx = position.X - circle.position.X;

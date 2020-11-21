@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    public float speed;
     public Rigidbody2D rb;
     public float mass = 100;
     public int id = 0;
@@ -39,15 +38,14 @@ public class PlayerManager : MonoBehaviour
     }
     */
 
-    public void Grow(int mass)
+    public void Grow(float scale)
     {
-        Debug.Log("Grow");
-        this.speed -= mass*0.05f;
-        Debug.Log("Mass = " + mass);
-        Debug.Log("This.mass = " + this.mass);
-        Debug.Log("mass/this.mass= " + mass / this.mass);
-        float scale = transform.localScale.x + mass/this.mass;
-        this.mass += mass;
+       // Debug.Log("Grow");
+       // Debug.Log("Mass = " + mass);
+       // Debug.Log("This.mass = " + this.mass);
+       // Debug.Log("mass/this.mass= " + mass / this.mass);
+       // float scale = transform.localScale.x + mass/this.mass;
+       // this.mass += mass;
         transform.localScale = new Vector3(scale, scale, scale);
     }
 }
